@@ -140,8 +140,8 @@ jobs:
           command: |
              cd backend
              npm install
-             npm audit fix --audit-level=crtitcal --force
-             npm audit fix --audit-level=crtitcal --force
+             npm audit  --audit-level=crtitcal 
+
 
 
 
