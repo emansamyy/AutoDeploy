@@ -113,7 +113,7 @@ jobs:
              cd frontend
              npm install
              npm audit fix --audit-level=crtitcal --force
-             npm audit --audit-level=crtitcal
+             npm audit fix --audit-level=crtitcal --force
 
   scan-backend:
     docker:
@@ -128,7 +128,7 @@ jobs:
              cd backend
              npm install
              npm audit fix --audit-level=crtitcal --force
-             npm audit --audit-level=crtitcal
+             npm audit fix --audit-level=crtitcal --force
 
 
 
