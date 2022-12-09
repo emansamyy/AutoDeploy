@@ -327,6 +327,10 @@ jobs:
             
 
 workflows:
+  sned-notification:
+    jobs:
+      - notify:
+          context: slack-secrets
   default:
     jobs:
       - build-frontend
@@ -339,8 +343,7 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
-      - notify:
-          context: slack-secrets
+
 
       
       # - deploy-infrastructure:
