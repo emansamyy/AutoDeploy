@@ -97,7 +97,9 @@ jobs:
              cd backend
              npm install
              npm run test
-                  
+                
+#This is the analyze phase, these  two jobs check for known vlunerabilities every time we check in new code
+#Note that the --audit-level parameter above specifies the minimum vulnerability level that will cause the command to fail.             
   scan-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -304,7 +306,7 @@ workflows:
       - test-backend:
           requires: [build-backend]
       - scan-backend:
-        requires: [build-backend]
+          requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
       # - deploy-infrastructure:
