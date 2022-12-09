@@ -40,7 +40,6 @@ jobs:
       - image: 'cimg/base:stable'
     steps:
       - slack/notify
-      notify:
           custom: |
             {
               "blocks": [
