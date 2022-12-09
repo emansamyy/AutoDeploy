@@ -326,7 +326,8 @@ jobs:
 workflows:
 
     jobs:
-
+      - notify:
+          context: slack-secrets      
       - build-frontend
       - build-backend
       - test-frontend:
@@ -337,8 +338,7 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
-      - notify:
-          context: slack-secrets      
+      
 
       
       # - deploy-infrastructure:
