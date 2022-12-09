@@ -39,7 +39,7 @@ jobs:
     docker:
       - image: 'cimg/base:stable'
     steps:
-      - slack/
+      - slack/notify
       notify:
           custom: |
             {
