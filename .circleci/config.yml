@@ -112,6 +112,7 @@ jobs:
           command: |
              cd frontend
              npm install
+             npm audit --audit-level=crtitcal --force
              npm audit --audit-level=crtitcal
 
   scan-backend:
@@ -126,6 +127,7 @@ jobs:
           command: |
              cd backend
              npm install
+             npm audit --audit-level=crtitcal --force
              npm audit --audit-level=crtitcal
 
 
