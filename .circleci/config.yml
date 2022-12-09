@@ -64,6 +64,7 @@ jobs:
              cd backend
              npm install
              npm run build
+             npm fund
              exit 1
       - save_cache:
           paths: [backend/node_modules]
