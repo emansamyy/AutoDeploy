@@ -8,7 +8,8 @@ Parameters:
 
 
 Resources:
-  
+  #An origin access identity is a special CloudFront user 
+  #that you can associate with Amazon S3 origins, so that you can secure all or just some of your Amazon S3 content.
   CloudFrontOriginAccessIdentity:
     Type: "AWS::CloudFront::CloudFrontOriginAccessIdentity"
     Properties:
