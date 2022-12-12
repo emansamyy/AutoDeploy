@@ -3,7 +3,7 @@
 - name: "configuration play." 
   hosts: web
   user: ubuntu
-  become: true
+  become: true #escalate user privileges
   become_method: sudo
   become_user: root  
   gather_facts: false
