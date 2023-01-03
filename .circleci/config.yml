@@ -186,8 +186,8 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
             
-      - destroy-environment  
-      - revert-migrations
+      # - destroy-environment  
+      # - revert-migrations
 
   # configure-infrastructure:
   #   docker:
@@ -340,16 +340,16 @@ workflows:
           requires: [build-backend]
       - analyze-frontend:
           requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     requires:
-      #       - test-frontend
-      #       - test-backend
-      #       - analyze-frontend
-      #       - analyze-backend      
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
+      - deploy-infrastructure:
+          requires:
+            - test-frontend
+            - test-backend
+            - analyze-frontend
+            - analyze-backend      
+          filters:
+            branches:
+              only:
+                - master
       
       
       # - configure-infrastructure:
