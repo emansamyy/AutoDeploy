@@ -4,19 +4,28 @@ orbs:
 
 commands:
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    description: Destroy Cloud Formation Stacks and infrastructure
     parameters:
-      workflow_id:
+      when:
+        type: string
+      id:
         type: string
     steps:
       - run:
-          name: Destroy environments
-          when: on_fail
+          name: Destroy udapeople backend cfn stack
           command: |
-            echo "Destroying environment: << parameters.workflow_id >> "
-            aws s3 rm --recursive s3://udapeople-<< parameters.workflow_id >>
-            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.workflow_id >>
-            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.workflow_id >>
+            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.id >>
+          environment:
+            TERM: xterm-256color
+          when: << parameters.when >>
+      - run:
+          name: Destroy udapeople frontend cfn stack and S3 bucket
+          command: |
+            aws s3 rm s3://udapeople-<< parameters.id >> --recursive
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.id >>
+          environment:
+              TERM: xterm-256color
+          when: << parameters.when >>
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -182,10 +191,10 @@ jobs:
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --output text 2>&1 | tee -a  .circleci/ansible/inventory.txt
       - persist_to_workspace:
-          root: ~/
+          root: .
           paths:
             - project/.circleci/ansible/inventory.txt
-            - persist-WORKFLOW_ID.txt
+            
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"  
           when: on_fail    
