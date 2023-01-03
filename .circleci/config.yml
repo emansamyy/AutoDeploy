@@ -146,49 +146,49 @@ jobs:
              npm audit fix --audit-level=crtitcal --force
              npm audit fix --audit-level=crtitcal --force
 
-  # deploy-infrastructure:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install tar and gzip
-  #         command: |
-  #           yum install -y tar gzip
-  #     - run:
-  #         name: Ensure back-end infrastructure exists
-  #         command: |
-  #           aws cloudformation deploy \
-  #             --template-file .circleci/files/backend.yml \
-  #             --tags project=udapeople \
-  #             --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-  #             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar and gzip
+          command: |
+            yum install -y tar gzip
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=udapeople \
+              --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
 
-  #     - run:
-  #         name: Ensure front-end infrastructure exist
-  #         command: |
-  #           aws cloudformation deploy \
-  #             --template-file .circleci/files/frontend.yml \
-  #             --tags project=udapeople \
-  #             --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
-  #             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople \
+              --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
 
-  #     - run:
-  #         name: Add back-end ip to ansible inventory
-  #         command: |
-  #           echo "[web]" 2>&1 | tee -a .circleci/ansible/inventory.txt
-  #           aws ec2 describe-instances \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #             --output text 2>&1 | tee -a  .circleci/ansible/inventory.txt
-  #     - persist_to_workspace:
-  #         root: ~/
-  #         paths:
-  #           - project/.circleci/ansible/inventory.txt
-  #           - persist-WORKFLOW_ID.txt
-  #     - destroy-environment:
-  #         workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"  
-  #         when: on_fail    
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            echo "[web]" 2>&1 | tee -a .circleci/ansible/inventory.txt
+            aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text 2>&1 | tee -a  .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+            - persist-WORKFLOW_ID.txt
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"  
+          when: on_fail    
 
   # configure-infrastructure:
   #   docker:
@@ -341,16 +341,16 @@ workflows:
           requires: [build-backend]
       - analyze-frontend:
           requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     requires:
-      #       - test-frontend
-      #       - test-backend
-      #       - analyze-frontend
-      #       - analyze-backend      
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
+      - deploy-infrastructure:
+          requires:
+            - test-frontend
+            - test-backend
+            - analyze-frontend
+            - analyze-backend      
+          filters:
+            branches:
+              only:
+                - master
       
       
       # - configure-infrastructure:
