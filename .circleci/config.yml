@@ -247,17 +247,15 @@ jobs:
     steps:
       - checkout
       - install_awscli
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       apk add --update --no-cache tar gzip nodejs npm aws-cli curl
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update --no-cache tar gzip nodejs npm aws-cli curl
       - run:
           name: Run migrations
           command: |
             cd backend
             npm install
-            npm run build
-            npm audit fix --force
             npm run migrations >> migrations_dump.txt
 
       - run:
@@ -265,7 +263,7 @@ jobs:
           command: |
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-              curl https://kvdb.io/LqeUNNoBqwgaVxHJJ3tXUC/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl --insecure https://kvdb.io/LqeUNNoBqwgaVxHJJ3tXUC/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
    
             fi
             
