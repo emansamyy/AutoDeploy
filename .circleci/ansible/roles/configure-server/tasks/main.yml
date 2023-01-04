@@ -1,0 +1,30 @@
+---
+
+- name: "update and upgrade packages."  # sudo apt upgrade
+
+  become: yes #escalate user privileges
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_tine: 86400
+
+- name: "remove unneeded and upgrade packages."  #sudo apt autoremove
+  become: yes #escalate user privileges
+  apt:
+    autoremove: yes
+
+- name: "install dependencies."  #sudo apt isntall nodejs npm
+  become: yes #escalate user privileges
+  apt:
+    name: ['nodejs','npm']
+    state: latest
+    update_cache: yes
+
+- name: "install pm2."  #sudo npm isntall pm2 -g
+  become: yes #escalate user privileges
+  apt:
+    name: pm2
+    global: yes
+    state: latest
+    update_cache: yes
+    production: yes

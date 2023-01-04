@@ -189,26 +189,33 @@ jobs:
       - destroy-environment  
       - revert-migrations
 
-  # configure-infrastructure:
-  #   docker:
-  #     - image: ansible/ansible
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints:
-  #     - attach_workspace:
-  #         at: .
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-
-  #     - run:
-  #         name: Configure server
-  #         command: |
+  configure-infrastructure:
+    docker:
+      - image: ansible/ansible
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - 'ec:80:25:e9:63:45:0b:35:17:98:f6:14:c6:e6:ec:92:8f:7e:7b:7c:b0:df:01:82:52:dd:96:c1:38:86:48:18'
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update --no-cache tar gzip ansible awscli
           
-  #     - destroy-environment:
-  #         workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"  
-  #         when: on_fail    
+
+      - attach_workspace:
+          at: ~/
+
+
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            ansible playbook -i inventory.txt configure-server.yml
+          
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"  
+          when: on_fail    
 
 #   run-migrations:
 #     docker:
