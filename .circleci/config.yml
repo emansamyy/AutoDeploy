@@ -194,23 +194,20 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
+      - install_awscli
+      - install_ansible
       - add_ssh_keys:
           fingerprints:
             - 'ec:80:25:e9:63:45:0b:35:17:98:f6:14:c6:e6:ec:92:8f:7e:7b:7c:b0:df:01:82:52:dd:96:c1:38:86:48:18'
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       apk add --update --no-cache tar gzip ansible awscli
-          
 
       - attach_workspace:
           at: ~/
-
 
       - run:
           name: Configure server
           command: |
             cd .circleci/ansible
+            cat inventory.txt
             ansible playbook -i inventory.txt configure-server.yml
           
       - destroy-environment
