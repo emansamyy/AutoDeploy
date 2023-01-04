@@ -266,7 +266,7 @@ jobs:
             fi
             
 
-      - destroy_environment
+      - destroy-environment
       - revert-migrations   
 
 #   deploy-frontend:
