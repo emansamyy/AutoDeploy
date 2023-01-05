@@ -39,7 +39,7 @@ commands:
         type: string
     steps:
       - run:
-          name: Destroy environments
+          name: Destroy environment
           when: on_fail
           command: |
             aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
