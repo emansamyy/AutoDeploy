@@ -247,10 +247,7 @@ jobs:
     steps:
       - checkout
       - install_awscli
-      - run:
-          name: Install dependencies
-          command: |
-            sudo npm install npm -g
+
       - run:
           name: Run migrations
           command: |
