@@ -334,13 +334,17 @@ jobs:
       - attach_workspace:
           at: .
 
-      - install_awscli
-      - install_ansible
-      - install_nodejs
+      - run:
+          name: Install dependencies
+          command: |
+            apk --no-cache add curl
+            apk add --update npm
+            apk add --no-cache python3 py3-pip \
+              && pip3 install --upgrade pip \
+              && pip install awscli
 
       - attach_workspace:
-          #at: .
-          at: ~/
+          at: .
       - restore_cache:
           keys: [backend-build]
       - run:
