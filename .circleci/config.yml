@@ -357,7 +357,7 @@ jobs:
       - run:
           name: Backend smoke tst.
           command: |
-            
+            export BACKEND_IP=$(aws ec2 describe-instances...............)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
