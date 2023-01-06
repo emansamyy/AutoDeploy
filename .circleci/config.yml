@@ -359,7 +359,7 @@ jobs:
             sudo apt install -y nodejs
 
       - run:
-          name: Backend smoke test.
+          name: Backend smoke tst.
           command: |
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
