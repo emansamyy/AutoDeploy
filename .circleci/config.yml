@@ -339,7 +339,7 @@ jobs:
 
   smoke-test:
     docker:
-      - image: 'cimg/base:stable'
+      - image: alpine:latest 
     steps:
       - checkout
       - attach_workspace:
@@ -348,7 +348,11 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo apt-get install curl nodejs awscli
+            apk --no-cache add curl
+            apk add --update npm
+            apk add --no-cache python3 py3-pip \
+              && pip3 install --upgrade pip \
+              && pip install awscli
 
       - run:
           name: Backend smoke tst.
