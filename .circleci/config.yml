@@ -1,9 +1,6 @@
 version: 2.1
 orbs:
   slack: circleci/slack@4.9.3
-
-
-
 commands:
   install_awscli:
     description: Install AWS CLI v
@@ -197,16 +194,16 @@ jobs:
               --tags project=udapeople \
               --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-      - run:
-          name: Save backend URL to kvdb
-          command: |
-            BACKEND_URL=$(aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicDnsName' \
-              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output text)
-            echo "BACKEND_URL:${BACKEND_URL}";
-            echo "CIRCLE_WORKFLOW_ID:${CIRCLE_WORKFLOW_ID}";
-            curl --request PUT --data "${BACKEND_URL}" https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL  
+      # - run:
+      #     name: Save backend URL to kvdb
+      #     command: |
+      #       BACKEND_URL=$(aws ec2 describe-instances \
+      #         --query 'Reservations[*].Instances[*].PublicDnsName' \
+      #         --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+      #         --output text)
+      #       echo "BACKEND_URL:${BACKEND_URL}";
+      #       echo "CIRCLE_WORKFLOW_ID:${CIRCLE_WORKFLOW_ID}";
+      #       curl --request PUT --data "${BACKEND_URL}" https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL  
 
       - run:
           name: Ensure front-end infrastructure exist
@@ -231,7 +228,7 @@ jobs:
             - project/.circleci/ansible/inventory.txt
             
       - destroy-environment  
-      - revert-migrations
+
 
   configure-infrastructure:
     docker:
@@ -250,7 +247,9 @@ jobs:
       - run:
           name: Configure server
           command: |
-            cd .circleci/ansible
+            pwd &&
+            ls -la
+            cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
           
       - destroy-environment
@@ -293,14 +292,26 @@ jobs:
       - install_awscli
       - install_ansible
       - install_nodejs
-      - attach_workspace:
-          at: .
+      - restore_cache:
+          keys: [frontend-build]
+      # - attach_workspace:
+      #     at: .
+      - run:
+          name: Install dependencies
+          command: |
+            cd frontend
+            npm install 
       - run:
           name: Get backend url
           command: |
-            BACKEND_IP=$(curl --request GET --data "${BACKEND_URL}" https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL)
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}" >> "frontend/.env"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
       - run:
           name: Deploy frontend objects
           command: |
@@ -327,15 +338,27 @@ jobs:
       - install_awscli
       - install_ansible
       - install_nodejs
+
+      - attach_workspace:
+          #at: .
+          at: ~/
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Package backend
+          command: |
+            cd backend
+            npm run build
+            tar -czvf artifact.tar.gz dist/* package*
+            cd ..
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+
       - run:
           name: Deploy backend
           command: |
-            cd backend
-            npm i
-            npm run build
-            cd ..
-            # Zip the directory
-            tar -C backend -czvf artifact.tar.gz .
+            export TYPEORM_MIGRATIONS_DIR=./migrations
+            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+            export TYPEORM_MIGRATIONS=./migrations/*.ts 
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
@@ -347,32 +370,34 @@ jobs:
 
   smoke-test:
     docker:
-      - image: alpine:latest 
+      - image: cimg/base:stable
     steps:
       - checkout
-      # - attach_workspace:
-      #     at: .
-
-      - run:
-          name: Install dependencies
-          command: |
-            apk --no-cache add curl
-            apk add --update npm
-            apk add --no-cache python3 py3-pip \
-              && pip3 install --upgrade pip \
-              && pip install awscli
+      - install_awscli
+      - install_nodejs
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       apk --no-cache add curl
+      #       apk add --update npm
+      #       apk add --no-cache python3 py3-pip \
+      #         && pip3 install --upgrade pip \
+      #         && pip install awscli
 
       - run:
           name: Backend smoke test.
           command: |
-            export BACKEND_IP=$(curl --request GET https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL)
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
+            echo "API_URL = ${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
             then
-                return 0
+              exit 0
             else
-                return 1
+              exit 1
             fi
 
       - run:

@@ -1,47 +1,24 @@
 ---
-- name: Upgrade npm
-  become: true
-  shell: |
-    npm install -g npm@latest
-- name: Copy compiled files
+- name: "Creating the BackEnd Application directory"
+  file:
+    path: ~/backend-app
+    state: directory
+- name: "Unzipping the Backend Files"
   unarchive:
-    src: /root/project/backend.tar.gz
-    dest: /home/ubuntu/
-
-- name: Build backend
-  ignore_errors: yes
+    src: artifact.tar.gz
+    dest: ~/backend-app
+- name: "Installing node Dependencies"
   shell: |
-    cd /home/ubuntu/backend
+    cd ~/backend-app
     npm i
-    npm run build
-- name: Stop and delete already running server
-  ignore_errors: yes
+- name: "Executing the Node App with pm2"
   shell: |
-    pm2 stop backend
-    pm2 delete backend
-
-
-- name: Configuring pm2 to start as a service
-  become: true
+    cd ~/backend-app/dist
+    pm2 stop default
+    pm2 start main.js
+  # register: execute_node
+- name: "Configuring pm2 to start as a service"
+  #become: true
   shell: |
-    sudo su -c "env PATH=$PATH:/usr/local/bin pm2 srartup systemd -u ubuntu --hp/home/ubuntu" 
+    sudo su -c "env PATH=$PATH:/usr/local/bin pm2 startup systemd -u upuntu --hp /home/ubuntu"
     pm2 save
-- name: Start server
-  become: true
-  command: |
-    cd /home/ubuntu/backend
-    pm2 start npm --name backend -- start
-  args:
-    chdir: /home/ubuntu/uda_app/dist
-  environment:
-   ENVIRONMENT: production
-   TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
-   TYPEORM_MIGRATIONS_DIR: "./migrations"
-   TYPEORM_MIGRATIONS: "./migrations/*.js"
-   TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
-   TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
-   TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
-   TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
-   TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
-   TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
-  
