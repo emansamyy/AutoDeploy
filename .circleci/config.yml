@@ -341,7 +341,7 @@ jobs:
       # Lightweight Docker image 
     steps:
       -checkout
-      - run:
+
       - install_awscli
       - install_ansible
       - install_nodejs
