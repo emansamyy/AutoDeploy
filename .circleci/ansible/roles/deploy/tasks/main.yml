@@ -24,9 +24,7 @@
 - name: Configuring pm2 to start as a service
   become: true
   shell: |
-    cd su -c "env PATH=/usr/local/bin pm2 srartup systemd -u ubuntu --hp/home/ubuntu" 
-    sudo systemctl stop firewalld
-    sudo systemctl disable firewalld
+    sudo su -c "env PATH=$PATH:/usr/local/bin pm2 srartup systemd -u ubuntu --hp/home/ubuntu" 
     pm2 save
 - name: Start server
   become: true
