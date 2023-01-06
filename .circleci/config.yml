@@ -206,7 +206,16 @@ jobs:
               --tags project=udapeople \
               --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
-
+      - run:
+          name: Send backend IP to kvdb
+          command: |
+            pwd
+            BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text)
+            echo "BACKEND_IP=${BACKEND_IP}"
+            curl -H "Content-Type: text/plain" -H "token: TwFawbDPBpKCSSQWApk9AK" --request PUT --data "$BACKEND_IP" https://kvdb.io/values/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7}
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -358,7 +367,7 @@ jobs:
       - run:
           name: Backend smoke tst.
           command: |
-            
+            BACKEND_IP=$(curl -H "token: TwFawbDPBpKCSSQWApk9AK" --request GET https://api.memstash.io/values/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7})
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
