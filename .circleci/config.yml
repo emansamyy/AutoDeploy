@@ -277,15 +277,12 @@ jobs:
       - image: doctrine/nodejs-aws-cli
     steps:
       - checkout
-      - attach_workspace:
-          at: .
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       apk add --no-cache tar gzip nodejs npm ansible curl aws-cli
+
       - install_awscli
       - install_ansible
       - install_nodejs
+      - attach_workspace:
+          at: .
       - run:
           name: Get backend url
           command: |
