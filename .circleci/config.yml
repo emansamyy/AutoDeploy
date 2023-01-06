@@ -349,9 +349,8 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            pip install awscli ansible
-      - install_ansible
-      - install_nodejs
+            pip install awscli ansible nodejs
+
 
       - run:
           name: Backend smoke test.
