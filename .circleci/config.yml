@@ -346,8 +346,7 @@ jobs:
           command: |
             pip install awscli
             pip install ansible
-      - install_ansible
-      - install_nodejs
+
       - run:
           name: Backend smoke test.
           command: |
