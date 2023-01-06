@@ -66,8 +66,34 @@ commands:
               npm install
               npm run migration:revert
             fi
-            
+     
 jobs:
+  install-backend-dependencies:
+    executor: node
+    steps:
+      - checkout
+      - run:
+          name: npm install
+          working_directory: ./backend
+          command: ls -la && npm install
+      - persist_to_workspace:
+          root: .
+          paths:
+            - backend/node_modules
+
+
+  install-frontend-dependencies:
+   executor: node
+   steps:
+      - checkout
+      - run:
+          name: npm install
+          working_directory: ./frontend
+          command: ls -la && npm install
+      - persist_to_workspace:
+          root: .
+          paths:
+            - frontend/node_modules
   notify:
     docker:
       - image: 'cimg/base:stable'
@@ -90,7 +116,6 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
-            npm install
             npm run build
         
       - save_cache:
@@ -108,7 +133,6 @@ jobs:
           name: Back-end build
           command: |
              cd backend
-             npm install
              npm run build
              npm fund
         
@@ -252,7 +276,6 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            npm install
             npm run migrations >> migrations_dump.txt
 
       - run:
