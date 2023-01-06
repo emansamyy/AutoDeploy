@@ -19,17 +19,29 @@
   shell: |
     pm2 stop backend
     pm2 delete backend
-- name: Start server
-  become: true
-  shell: |
-    cd /home/ubuntu/backend
-    pm2 start npm --name backend -- start
-    pm2 ls
+
 
 - name: Configuring pm2 to start as a service
   become: true
   shell: |
     cd su -c "env PATH=/usr/local/bin pm2 srartup systemd -u ubuntu --hp/home/ubuntu" 
     pm2 save
-
+- name: Start server
+  become: true
+  command: |
+    cd /home/ubuntu/backend
+    pm2 start npm --name backend -- start
+  args:
+    chdir: /home/ubuntu/uda_app/dist
+  environment:
+   ENVIRONMENT: production
+   TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
+   TYPEORM_MIGRATIONS_DIR: "./migrations"
+   TYPEORM_MIGRATIONS: "./migrations/*.js"
+   TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
+   TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
+   TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
+   TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
+   TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
+   TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
   
