@@ -277,10 +277,13 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --no-cache tar gzip nodejs npm ansible curl aws-cli
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       apk add --no-cache tar gzip nodejs npm ansible curl aws-cli
+      - install_awscli
+      - install_ansible
+      - install_nodejs
       - run:
           name: Get backend url
           command: |
