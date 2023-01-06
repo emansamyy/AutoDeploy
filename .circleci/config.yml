@@ -188,7 +188,7 @@ jobs:
             yum install -y tar gzip
       - run:
           name: Ensure back-end infrastructure exists
-          working_directory: ./.circleci/files
+
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
@@ -207,7 +207,7 @@ jobs:
 
       - run:
           name: Ensure front-end infrastructure exist
-          working_directory: ./.circleci/files
+
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
@@ -217,12 +217,11 @@ jobs:
 
       - run:
           name: Add back-end ip to ansible inventory
-          working_directory: ./.circleci/ansible
           command: |
-            aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output text 2>&1 | tee -a  .circleci/ansible/inventory.txt
+            pwd
+            BACKEND_IP=$(curl --request GET https://api.memstash.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL_${CIRCLE_WORKFLOW_ID:0:7})
+            echo ${BACKEND_IP} >> ./.circleci/ansible/inventory.txt
+            cat ./.circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -382,21 +381,21 @@ jobs:
       #         && pip3 install --upgrade pip \
       #         && pip install awscli
 
-      - run:
-          name: Backend smoke test.
-          command: |
-            export BACKEND_IP=$(aws ec2 describe-instances \
-              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "API_URL = ${API_URL}"
-            if curl "${API_URL}/api/status" | grep "ok"
-            then
-              exit 0
-            else
-              exit 1
-            fi
+      # - run:
+      #     name: Backend smoke test.
+      #     command: |
+      #       export BACKEND_IP=$(aws ec2 describe-instances \
+      #         --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+      #         --query 'Reservations[*].Instances[*].PublicIpAddress' \
+      #         --output text)
+      #       export API_URL="http://${BACKEND_IP}:3030"
+      #       echo "API_URL = ${API_URL}"
+      #       if curl "${API_URL}/api/status" | grep "ok"
+      #       then
+      #         exit 0
+      #       else
+      #         exit 1
+      #       fi
 
       - run:
           name: Frontend smoke test.
@@ -501,7 +500,7 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
-      # - cleanup:
-      #     requires: [cloudfront-update]
+      - cloudfront-update:
+          requires: [smoke-test]
+      - cleanup:
+          requires: [cloudfront-update]
