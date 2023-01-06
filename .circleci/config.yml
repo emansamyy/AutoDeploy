@@ -188,25 +188,26 @@ jobs:
             yum install -y tar gzip
       - run:
           name: Ensure back-end infrastructure exists
+          working_directory: ./.circleci/files
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople \
               --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-      # - run:
-      #     name: Save backend URL to kvdb
-      #     command: |
-      #       BACKEND_URL=$(aws ec2 describe-instances \
-      #         --query 'Reservations[*].Instances[*].PublicDnsName' \
-      #         --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #         --output text)
-      #       echo "BACKEND_URL:${BACKEND_URL}";
-      #       echo "CIRCLE_WORKFLOW_ID:${CIRCLE_WORKFLOW_ID}";
-      #       curl --request PUT --data "${BACKEND_URL}" https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL  
+              --tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+      - run:
+          name: Save backend URL to kvdb
+          command: |
+            BACKEND_URL=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicDnsName' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text)
+            curl --request PUT --data "${BACKEND_URL}" https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL  
 
       - run:
           name: Ensure front-end infrastructure exist
+          working_directory: ./.circleci/files
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
