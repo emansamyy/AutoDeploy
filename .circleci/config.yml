@@ -250,14 +250,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run:
-          name: Install AWS CLI dependencies
-          working_directory: /tmp
-          command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+      - install_awscli
 
       - run:
           name: Run migrations
@@ -286,14 +279,14 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       apk add --no-cache tar gzip nodejs npm ansible curl aws-cli
+      - install_awscli
+      - install_ansible
+      - install_nodejs
       - run:
-          name: Install AWS CLI dependencies
-          working_directory: /tmp
-          command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
           name: Get backend url
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances...............)
@@ -324,14 +317,9 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run:
-          name: Install dependencies
-          working_directory: /tmp
-          command: |
-            apk add --update ansible curl rsync openssh nodejs npm
-            ansible --version
-            pip install awscli
-            aws --version
+      - install_awscli
+      - install_ansible
+      - install_nodejs
       - run:
           name: Deploy backend
           command: |
@@ -360,11 +348,17 @@ jobs:
 
       - run:
           name: Install dependencies
-          working_directory: /tmp
           command: |
-            apk add --update curl nodejs npm
-            pip install awscli
-
+            sudo apt-get install curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt install -y nodejs
 
       - run:
           name: Backend smoke test.
