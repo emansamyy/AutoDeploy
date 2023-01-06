@@ -338,7 +338,7 @@ jobs:
 
   smoke-test:
     docker:
-      # Lightweight Docker image 
+      - image: python:3.7-alpine3.11
     steps:
       -checkout
       - install_awscli
