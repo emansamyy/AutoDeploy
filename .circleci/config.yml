@@ -368,7 +368,7 @@ jobs:
           name: Backend smoke tst.
           command: |
           
-            BACKEND_IP=$(curl --request GET https://kvdb.io/2Mr1LS3ReUJtjwPN9o14wA/migration_/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7})
+            BACKEND_IP=$(curl --request GET https://kvdb.io/TwFawbDPBpKCSSQWApk9AK/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7})
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
