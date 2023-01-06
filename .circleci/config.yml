@@ -216,6 +216,7 @@ jobs:
 
       - run:
           name: Add back-end ip to ansible inventory
+          working_directory: ./.circleci/ansible
           command: |
             aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
@@ -224,7 +225,7 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - project/.circleci/ansible/inventory.txt
+            - .circleci/ansible/inventory.txt
             
       - destroy-environment  
 
@@ -335,28 +336,19 @@ jobs:
 
       - run:
           name: Install dependencies
+          working_directory: /tmp
           command: |
             apk add --update ansible curl rsync openssh nodejs npm
             ansible --version
             pip install awscli
             aws --version
 
-      - attach_workspace:
-          at: .
       - restore_cache:
           keys: [backend-build]
-      # - run:
-      #     name: Package backend
-      #     command: |
-      #       cd backend
-      #       npm run build
-      #       tar -czvf artifact.tar.gz dist/* package*
-      #       cd ..
-      #       cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
 
       - run:
           name: Deploy backend
-          working_directory: ./.circleci/ansible
+          working_directory: .circleci/ansible
           command: |
             cat inventory
             ansible-playbook -i inventory deploy-server.yaml -vv
