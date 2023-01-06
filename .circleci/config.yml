@@ -350,8 +350,8 @@ jobs:
       - image: alpine:latest 
     steps:
       - checkout
-      - attach_workspace:
-          at: .
+      # - attach_workspace:
+      #     at: .
 
       - run:
           name: Install dependencies
@@ -363,7 +363,7 @@ jobs:
               && pip install awscli
 
       - run:
-          name: Backend smoke tst.
+          name: Backend smoke test.
           command: |
             export BACKEND_IP=$(curl --request GET https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL)
             export API_URL="http://${BACKEND_IP}:3030"
