@@ -290,6 +290,7 @@ jobs:
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances...............)
             export API_URL="http://${BACKEND_IP}:3030"
+            echo "BACKEND_IP = ${BACKEND_IP}"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
@@ -357,6 +358,7 @@ jobs:
       - run:
           name: Backend smoke tst.
           command: |
+            
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
