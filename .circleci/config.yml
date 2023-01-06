@@ -2,6 +2,8 @@ version: 2.1
 orbs:
   slack: circleci/slack@4.9.3
 
+
+
 commands:
   install_awscli:
     description: Install AWS CLI v2
@@ -223,7 +225,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: cimg/base:stable
+      - image: python:3.9.0-alpine
     steps:
       - checkout
       - install_awscli
@@ -245,7 +247,7 @@ jobs:
 
   run-migrations:
     docker:
-      - image: cimg/node:13.8.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - attach_workspace:
@@ -305,7 +307,7 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: cimg/base:stable
+      - image: python:3.9.0-alpine
     steps:
       - checkout
       - add_ssh_keys:
@@ -337,7 +339,7 @@ jobs:
 
   smoke-test:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: python:3.9.0-alpine
     steps:
       - checkout
       - attach_workspace:
@@ -346,17 +348,8 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add sudo
-            sudo apt-get install curl
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
-            sudo apt update
-            sudo apt install software-properties-common -y
-            sudo add-apt-repository --yes --update ppa:ansible/ansible
-            sudo apt install ansible -y
-            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-            sudo apt install -y nodejs
+            apk add --update curl nodejs npm
+            pip install awscli
 
       - run:
           name: Backend smoke tst.
