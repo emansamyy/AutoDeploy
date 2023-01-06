@@ -223,7 +223,7 @@ jobs:
             echo ${BACKEND_IP} >> ./.circleci/ansible/inventory.txt
             cat ./.circleci/ansible/inventory.txt
       - persist_to_workspace:
-          root: ~/
+          root: .
           paths:
             - .circleci/ansible/inventory.txt
             
@@ -287,7 +287,6 @@ jobs:
       - image: doctrine/nodejs-aws-cli
     steps:
       - checkout
-
       - install_awscli
       - install_ansible
       - install_nodejs
