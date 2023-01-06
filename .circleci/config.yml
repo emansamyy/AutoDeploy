@@ -246,6 +246,8 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - install_awscli
 
       - run:
