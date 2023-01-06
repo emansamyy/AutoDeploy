@@ -68,32 +68,6 @@ commands:
             fi
      
 jobs:
-  install-backend-dependencies:
-    executor: node
-    steps:
-      - checkout
-      - run:
-          name: npm install
-          working_directory: ./backend
-          command: ls -la && npm install
-      - persist_to_workspace:
-          root: .
-          paths:
-            - backend/node_modules
-
-
-  install-frontend-dependencies:
-   executor: node
-   steps:
-      - checkout
-      - run:
-          name: npm install
-          working_directory: ./frontend
-          command: ls -la && npm install
-      - persist_to_workspace:
-          root: .
-          paths:
-            - frontend/node_modules
   notify:
     docker:
       - image: 'cimg/base:stable'
@@ -116,6 +90,7 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
+            npm install
             npm run build
         
       - save_cache:
@@ -133,6 +108,7 @@ jobs:
           name: Back-end build
           command: |
              cd backend
+             npm install
              npm run build
              npm fund
         
@@ -276,6 +252,7 @@ jobs:
           name: Run migrations
           command: |
             cd backend
+            npm install
             npm run migrations >> migrations_dump.txt
 
       - run:
@@ -394,12 +371,8 @@ workflows:
           context: slack-secrets
   default:
     jobs:
-      - install-backend-dependencies
-      - install-frontend-dependencies
       - build-frontend
-          requires: [install-backend-dependencies]
       - build-backend
-          requires: [install-backend-dependencies]
       - test-frontend:
           requires: [build-frontend]
       - test-backend:
@@ -408,26 +381,21 @@ workflows:
           requires: [build-backend]
       - analyze-frontend:
           requires: [build-frontend]
-
       - deploy-infrastructure:
-          filters:
-            branches:
-              only:
-                - master
-      - configure-infrastructure:
           requires:
-            - deploy-infrastructure
-      - run-migrations:
-          requires:
-            - test-backend
             - test-frontend
-            - analyze-backend
+            - test-backend
             - analyze-frontend
-            - configure-infrastructure
+            - analyze-backend      
           filters:
             branches:
               only:
                 - master
+      
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
       # - deploy-frontend:
       #     requires: [run-migrations]
       # - deploy-backend:
