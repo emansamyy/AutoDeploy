@@ -333,10 +333,13 @@ jobs:
             npm i
             npm run build
             cd ..
-            BACKEND_IP=`cat inventory.txt | head -2 | tail -1`
-            echo "BACKEND_IP: ${BACKEND_IP}"
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i  inventory.txt deploy-backend.yml
+            cd .circleci/ansible
+            # Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
 
       - destroy-environment
       - revert-migrations   
@@ -363,7 +366,7 @@ jobs:
           name: Backend smoke tst.
           command: |
           
-            BACKEND_IP=$(curl --request GET -d "${BACKEND_URL}" https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7})
+            BACKEND_IP=$(curl --request GET -d "${BACKEND_URL}" https://kvdb.io/TwFawbDPBpKCSSQWApk9AK/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7})
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
