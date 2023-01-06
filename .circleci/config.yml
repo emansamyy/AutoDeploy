@@ -6,7 +6,7 @@ orbs:
 
 commands:
   install_awscli:
-    description: Install AWS CLI v2
+    description: Install AWS CLI v
     steps:
       - run:
           name: Install AWS CLI 
