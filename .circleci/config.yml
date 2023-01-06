@@ -343,6 +343,8 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - install_awscli
       - install_ansible
       - install_nodejs
