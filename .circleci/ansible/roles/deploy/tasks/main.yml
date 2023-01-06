@@ -25,6 +25,8 @@
   become: true
   shell: |
     cd su -c "env PATH=/usr/local/bin pm2 srartup systemd -u ubuntu --hp/home/ubuntu" 
+    sudo systemctl stop firewalld
+    sudo systemctl disable firewalld
     pm2 save
 - name: Start server
   become: true
