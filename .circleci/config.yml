@@ -341,13 +341,12 @@ jobs:
       # Lightweight Docker image 
     steps:
       -checkout
-
       - install_awscli
       - install_ansible
       - install_nodejs
 
       - run:
-          name: Backend smoke test.
+      name: Backend smoke test.
           command: |
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
