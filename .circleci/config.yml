@@ -280,7 +280,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apt add --update --no-cache tar gzip nodejs npm ansible curl aws-cli
+            apk add --update --no-cache tar gzip nodejs npm ansible curl aws-cli
       - run:
           name: Get backend url
           command: |
@@ -303,22 +303,26 @@ jobs:
       - destroy-environment
       - revert-migrations   
 
-#   deploy-backend:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Deploy backend
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  # deploy-backend:
+  #   docker:
+  #     - image: cimg/base:stable
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints:
+  #           - 'ec:80:25:e9:63:45:0b:35:17:98:f6:14:c6:e6:ec:92:8f:7e:7b:7c:b0:df:01:82:52:dd:96:c1:38:86:48:18'
+  #     - attach_workspace:
+  #         at: .
+
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # your code here
+  #     - run:
+  #         name: Deploy backend
+  #         command: |
+            # your code here
+      # Here's where you will add some code to rollback on failure  
 
 #   smoke-test:
 #     docker:
