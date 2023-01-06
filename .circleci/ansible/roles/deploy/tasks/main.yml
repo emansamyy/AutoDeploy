@@ -25,4 +25,11 @@
     cd /home/ubuntu/backend
     pm2 start npm --name backend -- start
     pm2 ls
+
+- name: Configuring pm2 to start as a service
+  become: true
+  shell: |
+    cd su -c "env PATH=/usr/local/bin pm2 srartup systemd -u ubuntu --hp/home/ubuntu" 
+    pm2 save
+
   
