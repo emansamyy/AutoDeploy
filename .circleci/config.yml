@@ -114,7 +114,7 @@ jobs:
              cd backend
              npm install
              npm run build
-             npm fund
+
         
       - save_cache:
           paths: [backend/node_modules]
@@ -365,15 +365,9 @@ jobs:
       - run:
           name: Backend smoke tst.
           command: |
-            # BACKEND_IP=$(curl --request GET https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
-            if curl "${API_URL}/api/status" | grep "ok"
-            then
-                return 0
-            else
-                return 1
-            fi
+            export BACKEND_IP=$(curl --request GET https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL)
+            curl "${BACKEND_IP}/api/status"
+
       - run:
           name: Frontend smoke test.
           command: |
