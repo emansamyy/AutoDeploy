@@ -336,11 +336,10 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk --no-cache add curl
-            apk add --update npm
-            apk add --no-cache python3 py3-pip \
-              && pip3 install --upgrade pip \
-              && pip install awscli
+            apk add --update ansible curl rsync openssh nodejs npm
+            ansible --version
+            pip install awscli
+            aws --version
 
       - attach_workspace:
           at: .
@@ -357,6 +356,7 @@ jobs:
 
       - run:
           name: Deploy backend
+          working_directory: ./.circleci/ansible
           command: |
             cat inventory
             ansible-playbook -i inventory deploy-server.yaml -vv
