@@ -365,7 +365,7 @@ jobs:
       - run:
           name: Backend smoke tst.
           command: |
-            BACKEND_IP=$(curl --request GET https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL)
+            # BACKEND_IP=$(curl --request GET https://kvdb.io/9CLk3YrAU5QLC2qdke97cA/BACKEND_URL)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
