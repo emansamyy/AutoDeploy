@@ -61,7 +61,7 @@ commands:
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             SUCCESS=$(curl --insecure  https://kvdb.io/2Mr1LS3ReUJtjwPN9o14wA/migration_<< parameters.Workflow_ID >>)
             # Logic for reverting the database state
-            if (( "$SUCCESS" == 1 ));
+            if (( "$SUCCESS" == 1 ))
             then
                 cd ~/project/backend
                 npm install
