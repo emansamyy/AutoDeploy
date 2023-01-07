@@ -346,16 +346,10 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            cd backend
-            npm i
-            npm run build
-            cd ..
-            # Zip the directory
-            tar -C backend -czvf artifact.tar.gz .
-            cd .circleci/ansible
-            echo "Contents  of the inventory.txt file is -------"
-            cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml
+          working_directory: ./.circleci/ansible
+          command: |
+            cat inventory
+            ansible-playbook -i inventory deploy-server.yaml -vv
 
       - destroy-environment
       - revert-migrations   
@@ -363,35 +357,34 @@ jobs:
 
   smoke-test:
     docker:
-      - image: cimg/base:stable
+      - image: python:3.9.0-alpine
     steps:
       - checkout
-      - install_awscli
-      - install_nodejs
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       apk --no-cache add curl
-      #       apk add --update npm
-      #       apk add --no-cache python3 py3-pip \
-      #         && pip3 install --upgrade pip \
-      #         && pip install awscli
 
-      # - run:
-      #     name: Backend smoke test.
-      #     command: |
-      #       export BACKEND_IP=$(aws ec2 describe-instances \
-      #         --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #         --query 'Reservations[*].Instances[*].PublicIpAddress' \
-      #         --output text)
-      #       export API_URL="http://${BACKEND_IP}:3030"
-      #       echo "API_URL = ${API_URL}"
-      #       if curl "${API_URL}/api/status" | grep "ok"
-      #       then
-      #         exit 0
-      #       else
-      #         exit 1
-      #       fi
+      - run:
+          name: Install dependencies
+          command: |
+            apk --no-cache add curl
+            apk add --update npm
+            apk add --no-cache python3 py3-pip \
+              && pip3 install --upgrade pip \
+              && pip install awscli
+
+      - run:
+          name: Backend smoke test.
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+              exit 0
+            else
+              exit 1
+            fi
 
       - run:
           name: Frontend smoke test.
@@ -400,12 +393,10 @@ jobs:
             echo ${URL}
             if curl -s ${URL} | grep "Welcome"
             then 
-              exit 1
+              exit 0
             else 
-              return 1
+              exit 1
             fi
-            # curl -s ${URL} | grep -q "Welcome"
-
 
       - destroy-environment
       - revert-migrations   
