@@ -1,0 +1,2 @@
+URL01: https://github.com/emansamyy/AutoDeploy
+URL02: https://s3.console.aws.amazon.com/s3/buckets/udapeople-056dbc8?region=us-west-1&tab=objects
