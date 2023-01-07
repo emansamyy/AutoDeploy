@@ -341,7 +341,7 @@ jobs:
             aws --version
       - run:
           name: Deploy backend
-          working_directory: ./.circleci/ansible
+          working_directory: .circleci/ansible
           command: |
             cat inventory
             ansible-playbook -i inventory deploy-server.yaml -vv
