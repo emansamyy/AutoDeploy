@@ -428,10 +428,10 @@ jobs:
               --tags project=udapeople 
 
   cleanup:
-      docker:
-        - image: amazon/aws-cli
-      steps:
-        - checkout
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
       - run:
           name: Clean up old environment
           command: |
