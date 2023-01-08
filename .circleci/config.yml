@@ -426,6 +426,15 @@ jobs:
             curl -sL https://rpm.nodesource.com/setup_10.x | bash -
             yum install -y nodejs
       - run:
+          name: Send old workflow ID to kvdb
+          working_directory: ./.circleci/files
+          command: |
+            OLD_WORKFLOW_ID=$(aws cloudformation list-exports \
+              --query "Exports[?Name==\`WorkflowID\`].Value" \
+              --no-paginate --output text)
+            echo "OLD_WORKFLOW_ID=$OLD_WORKFLOW_ID"
+            curl -H "Content-Type: text/plain" -H "token: 2Mr1LS3ReUJtjwPN9o14wA" --request PUT --data "$OLD_WORKFLOW_ID" https://api.memstash.io/values/OLD_WORKFLOW_ID
+      - run:
           name: Update cloudfront distribution
           command: |
             aws cloudformation deploy \
@@ -442,9 +451,7 @@ jobs:
       - run:
           name: Clean up old environment
           command: |
-            export OldWorkflowID=$(aws cloudformation \
-              list-exports --query "Exports[?Name==\'WorkflowID\'].Value" \
-              --no-paginate --output text)
+            export OldWorkflowID=$(curl -H "token: 2Mr1LS3ReUJtjwPN9o14wA" --request GET https://api.memstash.io/values/OLD_WORKFLOW_ID)
             
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
