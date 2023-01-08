@@ -429,11 +429,11 @@ jobs:
           name: Send old workflow ID to kvdb
           working_directory: ./.circleci/files
           command: |
-            OLD_WORKFLOW_ID=$(aws cloudformation list-exports \
-              --query "Exports[?Name==\`WorkflowID\`].Value" \
+            WorkflowID=$(aws cloudformation \
+              list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
             echo "OLD_WORKFLOW_ID=$OLD_WORKFLOW_ID"
-            curl -H "Content-Type: text/plain" -H "token: 2Mr1LS3ReUJtjwPN9o14wA" --request PUT --data "$OLD_WORKFLOW_ID" https://kvdb.io/values/OLD_WORKFLOW_ID
+            curl --request PUT --data "$WorkflowID" https://kvdb.io/2Mr1LS3ReUJtjwPN9o14wA/WorkflowID
       - run:
           name: Update cloudfront distribution
           command: |
@@ -451,7 +451,7 @@ jobs:
       - run:
           name: Clean up old environment
           command: |
-            export OldWorkflowID=$(curl -H "token: 2Mr1LS3ReUJtjwPN9o14wA" --request GET https://kvdb.io/values/OLD_WORKFLOW_ID)
+            export OldWorkflowID=$(curl --request GET https://kvdb.io/2Mr1LS3ReUJtjwPN9o14wA/WorkflowID)
             
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
