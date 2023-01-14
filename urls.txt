@@ -1,2 +1,5 @@
 URL01: https://github.com/emansamyy/AutoDeploy
-URL02: https://s3.console.aws.amazon.com/s3/buckets/udapeople-056dbc8?region=us-west-1&tab=objects
+URL02: http://udapeople-60e736a.s3-website-us-west-1.amazonaws.com/#/employees
+URL03: https://d2b9o8qzbukq2x.cloudfront.net/#/employees
+URL04: http://ec2-54-183-189-72.us-west-1.compute.amazonaws.com:3030/api/status
+URL05: http://ec2-13-57-56-157.us-west-1.compute.amazonaws.com:9090/targets
