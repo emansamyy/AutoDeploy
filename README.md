@@ -1,6 +1,9 @@
 ## AWS CI/CD Pipeline
 
 This project implements a continuous integration and continuous delivery (CI/CD) pipeline for infrastructure and application deployments on Amazon Web Services (AWS).
+## AWS CI/CD Pipeline
+
+This project implements a continuous integration and continuous delivery (CI/CD) pipeline for infrastructure and application deployments on Amazon Web Services (AWS).
 
 ### Built With
 
